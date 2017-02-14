@@ -1,5 +1,19 @@
 # pooltile
-Swimming pool mosaic generator
+Swimming pool mosaic images
+
+## Install
+
+```
+yarn install
+```
+
+## Usage
+
+### CLI
+
+```
+pooltile --output ./tile.jpg --source warby --gridsize 50
+```
 
 ## Credits:
 

@@ -1,38 +1,38 @@
-var Pixi = require("pixi.js");
-var { Application, Texture, extras } = Pixi;
-var { TilingSprite } = extras;
+const sharp = require("sharp");
 
-var targetTileSize = 50;
-var spriteWidth = 1000;
-var spriteHeight = 1000;
+// A cropped version of Blue Mosaic Bathroom Tiles by William Warby
+// https://www.flickr.com/photos/wwarby/6963447776
+const warby = {
+  path: "./assets/warby.jpg",
+  width: 1880,
+  height: 3012,
+  tile: {
+    width: 327,
+    height: 327
+  }
+};
 
-var imagePath = "./assets/warby.jpg";
-var imageWidth = 1880;
-var imageHeight = 3012;
-var tileSize = 373;
-var scale = targetTileSize / tileSize;
-// var scale = 0.1;
-var inverseScale = 1 / scale;
+const sources = { warby };
 
-var warbyTexture = Texture.fromImage(imagePath);
+const cli = args => {
+  const { source = "warby", gridSize = 50, output = "tile.jpg" } = args || {};
+  const photo = sources[source];
+  const scale = gridSize / photo.tile.width;
 
-var warbySprite = new TilingSprite(
-  warbyTexture,
-  spriteWidth * inverseScale,
-  spriteHeight * inverseScale
-);
-warbySprite.scale.set(scale, scale);
+  const width = Math.round(photo.width * scale);
+  const height = Math.round(photo.height * scale);
+  return sharp(photo.path).resize(width, height).toFile(output, err => {
+    console.error(err);
+  });
+};
 
-var { stage, renderer, view } = new Application();
+const opts = {
+  alias: {
+    gridSize: ["gridsize", "g"],
+    source: ["s"],
+    output: ["o"]
+  }
+};
+var argv = require("minimist")(process.argv.slice(2), opts);
 
-stage.addChild(warbySprite);
-
-renderer.autoResize = true;
-
-renderer.resize(window.screen.width, window.screen.height);
-document.body.appendChild(view);
-
-warbyTexture.addListener("update", event => {
-  console.log({ event });
-  console.log(warbyTexture.width, warbyTexture.height);
-});
+cli(argv);
